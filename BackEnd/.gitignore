@@ -24,4 +24,4 @@ dist-ssr
 *.sw?
 # serviceAccountKey.json
 BackEnd/serviceAccountKey/serviceAccountKey.json
-BackEnd/serviceAccountKey/*.json
+serviceAccountKey/*.json
