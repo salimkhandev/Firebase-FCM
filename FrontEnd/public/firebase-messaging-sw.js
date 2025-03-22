@@ -1,4 +1,3 @@
-
 importScripts('https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging-compat.js');
 
@@ -12,24 +11,18 @@ firebase.initializeApp({
     appId: "1:504230264197:web:6723b541451cb8fd2498ec",
     measurementId: "G-HL2TYM3QF6"
 });
-
-
-
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
-    console.log('Received background message:', payload);
+    console.log('[firebase-messaging-sw.js] Received background message ', payload);
 
-    // Only show a notification if there's no notification field (i.e., FCM won't handle it)
-    if (!payload.notification && payload.data) {
-        const notificationTitle = payload.data.title || 'Default Title';
-        const notificationOptions = {
-            body: payload.data.body || 'Default Body',
+    const notificationTitle = payload.notification.title;
+    const notificationOptions = {
+        body: payload.notification.body,
+        icon: payload.notification.icon || '/icon.png',
+        badge: payload?.webpush?.notification?.badge || '/badge.png',
+        image: payload.notification.image
+    };
 
-            icon: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJxo2NFiYcR35GzCk5T3nxA7rGlSsXvIfJwg&s',
-            image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJxo2NFiYcR35GzCk5T3nxA7rGlSsXvIfJwg&s",
-            badge: "https://cdn-icons-png.freepik.com/512/8297/8297354.png?ga=GA1.1.1954562269.1729245862"
-        };
-        return self.registration.showNotification(notificationTitle, notificationOptions);
-    }
+    self.registration.showNotification(notificationTitle, notificationOptions);
 });
