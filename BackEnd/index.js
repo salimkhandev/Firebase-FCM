@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
 // import db
-const pool = require('./config/dbconfig.js');
+const { pool } = require('./config/dbconfig');
 require('dotenv').config();
 const app = express();
 
@@ -66,15 +66,43 @@ app.get('/', (req, res) => {
 });
 app.post('/save-token', async (req, res) => {
     const { token } = req.body;
-    const saveResponse = await pool.query('INSERT INTO fcm_tokens (token) VALUES ($1)', [token]);
-    console.log('Successfully saved response:', saveResponse);
-    res.status(200).json({ success: true, response: saveResponse });
+    try {
+        // First check if token already exists
+        const existingToken = await pool.query(
+            'SELECT * FROM fcm_tokens WHERE token = $1',
+            [token]
+        );
+
+        if (existingToken.rows.length > 0) {
+            // Token exists, update it
+            await pool.query(
+                'UPDATE fcm_tokens SET user_id = $1 WHERE token = $2',
+                [1, token] // Using 1 as default user_id
+            );
+        } else {
+            // Token doesn't exist, insert new
+            await pool.query(
+                'INSERT INTO fcm_tokens (user_id, token) VALUES ($1, $2)',
+                [1, token] // Using 1 as default user_id
+            );
+        }
+
+        res.status(200).json({ success: true });
+    } catch (error) {
+        console.error('Error saving token:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
 });
 // get all tokens
 app.get('/get-tokens', async (req, res) => {
-    const tokens = await pool.query('SELECT * FROM fcm_tokens');
-    console.log('Successfully got tokens:', tokens);
-    res.status(200).json({ success: true, tokens: tokens.rows });
+    try {
+        const tokens = await pool.query('SELECT * FROM fcm_tokens');
+        console.log('Successfully got tokens:', tokens);
+        res.status(200).json({ success: true, tokens: tokens.rows });
+    } catch (error) {
+        console.error('Error getting tokens:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
 });
 
 const PORT = process.env.PORT || 3000;
