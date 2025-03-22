@@ -48,6 +48,9 @@ app.post('/send-notification', async (req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 });
+app.get('/', (req, res) => {
+    res.send('Hello World');
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
