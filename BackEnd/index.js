@@ -1,9 +1,13 @@
+require('dotenv').config();
 const express = require('express');
 const admin = require('firebase-admin');
-const serviceAccount = require('./serviceAccountKey/serviceAccountKey.json'); // Update the path
 
 admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
+    credential: admin.credential.cert({
+        projectId: process.env.PROJECT_ID,
+        clientEmail: process.env.CLIENT_EMAIL,
+        privateKey: process.env.PRIVATE_KEY.replace(/\\n/g, "\n"), // Handle newlines properly
+    })
 });
 
 const app = express();
