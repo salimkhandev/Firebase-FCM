@@ -17,12 +17,12 @@ messaging.onBackgroundMessage((payload) => {
     console.log('[firebase-messaging-sw.js] Received background message ', payload);
 
     const notificationTitle = payload.notification.title;
-    const notificationOptions = {
-        body: payload.notification.body,
-        icon: payload.notification.icon || '/icon.png',
-        badge: payload?.webpush?.notification?.badge || '/badge.png',
-        image: payload.notification.image
-    };
+    // const notificationOptions = {
+    //     body: payload.notification.body,
+    //     icon: payload.notification.icon || '/icon.png',
+    //     badge: payload?.webpush?.notification?.badge || '/badge.png',
+    //     image: payload.notification.image
+    // };
 
     self.registration.showNotification(notificationTitle, notificationOptions);
 });
