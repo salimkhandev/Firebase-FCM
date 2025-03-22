@@ -8,7 +8,7 @@ const app = express();
 
 // Enable CORS with specific options
 app.use(cors({
-    origin: 'http://localhost:5173', // Your frontend URL
+    origin: ['http://localhost:5173', 'https://firebase-fcm2.vercel.app/'],
     credentials: true
 }));
 app.use(express.json());
