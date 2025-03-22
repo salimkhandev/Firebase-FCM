@@ -20,13 +20,13 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
     console.log('Received background message:', payload);
 
-    // // Only show a notification if there's no notification field (i.e., FCM won't handle it)
-    // if (!payload.notification && payload.data) {
-    //     const notificationTitle = payload.data.title || 'Default Title';
-    //     const notificationOptions = {
-    //         body: payload.data.body || 'Default Body',
-    //         icon: '/icon.png',
-    //     };
-    //     return self.registration.showNotification(notificationTitle, notificationOptions);
-    // }
+    // Only show a notification if there's no notification field (i.e., FCM won't handle it)
+    if (!payload.notification && payload.data) {
+        const notificationTitle = payload.data.title || 'Default Title';
+        const notificationOptions = {
+            body: payload.data.body || 'Default Body',
+            icon: '/icon.png',
+        };
+        return self.registration.showNotification(notificationTitle, notificationOptions);
+    }
 });
