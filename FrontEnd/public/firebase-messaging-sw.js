@@ -25,7 +25,10 @@ messaging.onBackgroundMessage((payload) => {
         const notificationTitle = payload.data.title || 'Default Title';
         const notificationOptions = {
             body: payload.data.body || 'Default Body',
-            icon: '/icon.png',
+
+            icon: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJxo2NFiYcR35GzCk5T3nxA7rGlSsXvIfJwg&s',
+            image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJxo2NFiYcR35GzCk5T3nxA7rGlSsXvIfJwg&s",
+            badge: "https://cdn-icons-png.freepik.com/512/8297/8297354.png?ga=GA1.1.1954562269.1729245862"
         };
         return self.registration.showNotification(notificationTitle, notificationOptions);
     }
