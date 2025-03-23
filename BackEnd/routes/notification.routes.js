@@ -18,30 +18,21 @@ router.get('/get-tokens', async (req, res) => {
 // Save token
 router.post('/save-token', async (req, res) => {
     const { token } = req.body;
+
     try {
-        const existingToken = await pool.query(
-            'SELECT * FROM fcm_tokens WHERE token = $1',
+        // Insert the token, allowing multiple tokens but preventing exact duplicates
+        await pool.query(
+            'INSERT INTO fcm_tokens (token) VALUES ($1) ON CONFLICT (token) DO NOTHING',
             [token]
         );
 
-        if (existingToken.rows.length > 0) {
-            await pool.query(
-                'UPDATE fcm_tokens SET user_id = $1 WHERE token = $2',
-                [2, token]
-            );
-        } else {
-            await pool.query(
-                'INSERT INTO fcm_tokens (user_id, token) VALUES ($1, $2)',
-                [2, token]
-            );
-        }
-
-        res.status(200).json({ success: true });
+        res.status(201).json({ success: true, message: 'Token inserted or already exists' });
     } catch (error) {
         console.error('Error saving token:', error);
         res.status(500).json({ success: false, error: error.message });
     }
 });
+
 
 // Send notification
 router.post('/send-notification', async (req, res) => {
