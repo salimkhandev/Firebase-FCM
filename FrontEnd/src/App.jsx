@@ -90,23 +90,7 @@ const App = () => {
             />
             
             <div className="max-w-4xl mx-auto">
-                <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-                    <h1 className="text-3xl font-bold text-gray-800 mb-6">
-                        Push Notification Dashboard
-                    </h1>
-                    
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <h2 className="text-lg font-semibold text-blue-800 mb-2">
-                            Device Status
-                        </h2>
-                        <div className="flex items-center space-x-2">
-                            <div className={`w-3 h-3 rounded-full ${token ? 'bg-green-500' : 'bg-gray-400'}`}></div>
-                            <p className="text-sm text-gray-600">
-                                {token ? 'Device Ready' : 'Initializing...'}
-                            </p>
-                        </div>
-                    </div>
-                </div>
+               
 
                 <CustomNoti />
             </div>
