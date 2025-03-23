@@ -10,11 +10,7 @@ function CustomNoti() {
     const [error, setError] = useState(null);
     const [currentDeviceToken, setCurrentDeviceToken] = useState('');
     const API_URL = 'https://firebase-fcm2-backend.vercel.app';
-    const [imageUrl, setImageUrl] = useState('');
-    const [previewImage, setPreviewImage] = useState('');
-    const [useDefaultImage, setUseDefaultImage] = useState(true);
-
-    const DEFAULT_IMAGE = "https://www.shutterstock.com/image-vector/fired-rubber-stamp-seal-vector-260nw-2406578221.jpg";
+   
 
     // Fetch tokens from API
     useEffect(() => {
@@ -53,35 +49,13 @@ function CustomNoti() {
         fetchTokens();
     }, []);
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            if (file.size > 1024 * 1024) { // 1MB limit
-                alert('Image size should be less than 1MB');
-                return;
-            }
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setPreviewImage(reader.result);
-                setImageUrl(reader.result);
-                setUseDefaultImage(false);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
-    const handleRemoveImage = () => {
-        setImageUrl('');
-        setPreviewImage('');
-        setUseDefaultImage(false);
-    };
-
+    // Send notification
     const handleSubmit = async (e) => {
         e.preventDefault();
         setStatus('Sending notification...');
 
         try {
-            await fetch(`${API_URL}/send-notification`, {
+            const response = await fetch(`${API_URL}/send-notification`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -90,14 +64,24 @@ function CustomNoti() {
                     token: selectedToken,
                     title: title,
                     body: message,
-                    imageUrl: useDefaultImage ? DEFAULT_IMAGE : (imageUrl || null),
+                    imageUrl: "https://www.shutterstock.com/image-vector/fired-rubber-stamp-seal-vector-260nw-2406578221.jpg",
                     badgeUrl: "https://cdn-icons-png.flaticon.com/512/4658/4658667.png"
                 })
             });
-            
-            setTitle('');
-            setMessage('');
-            setStatus('Notification sent successfully!');
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (data.success) {
+                setStatus('Notification sent successfully!');
+                setTitle('');
+                setMessage('');
+            } else {
+                throw new Error('Failed to send notification');
+            }
         } catch (error) {
             console.error('Error details:', error);
             setStatus('Error sending notification: ' + error.message);
@@ -118,8 +102,8 @@ function CustomNoti() {
                         token: tokenData.token,
                         title: title,
                         body: message,
-                        imageUrl: useDefaultImage ? DEFAULT_IMAGE : (imageUrl || null),
-                        badgeUrl: "https://example.com/default-badge.png"
+                        imageUrl: "https://www.shutterstock.com/image-vector/fired-rubber-stamp-seal-vector-260nw-2406578221.jpg",
+                        badgeUrl: "https://cdn-icons-png.flaticon.com/512/4658/4658667.png"
                     })
                 });
             }
@@ -269,88 +253,6 @@ function CustomNoti() {
                             >
                                 Success Message
                             </button>
-                        </div>
-                    </div>
-
-                    {/* Image Selection Section */}
-                    <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">
-                            Notification Image (Optional)
-                        </label>
-                        
-                        {/* Image Options */}
-                        <div className="space-y-4">
-                            {/* Default Image Option */}
-                            <div className="flex items-center space-x-3">
-                                <input
-                                    type="checkbox"
-                                    id="useDefaultImage"
-                                    checked={useDefaultImage}
-                                    onChange={(e) => setUseDefaultImage(e.target.checked)}
-                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                />
-                                <label htmlFor="useDefaultImage" className="text-sm text-gray-600">
-                                    Use default image
-                                </label>
-                            </div>
-
-                            {/* Default Image Preview */}
-                            {useDefaultImage && (
-                                <div className="mt-2">
-                                    <div className="relative w-48 h-48 rounded-lg overflow-hidden border border-gray-200">
-                                        <img
-                                            src={DEFAULT_IMAGE}
-                                            alt="Default"
-                                            className="w-full h-full object-cover"
-                                        />
-                                    </div>
-                                    <p className="mt-1 text-xs text-gray-500">
-                                        Default notification image
-                                    </p>
-                                </div>
-                            )}
-
-                            {/* Custom Image Upload */}
-                            {!useDefaultImage && (
-                                <div className="space-y-2">
-                                    <div className="flex items-center space-x-4">
-                                        <label className="cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                            <span>{imageUrl ? 'Change Image' : 'Upload Custom Image'}</span>
-                                            <input
-                                                type="file"
-                                                className="hidden"
-                                                accept="image/*"
-                                                onChange={handleImageChange}
-                                            />
-                                        </label>
-                                        {imageUrl && (
-                                            <button
-                                                type="button"
-                                                onClick={handleRemoveImage}
-                                                className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                                            >
-                                                Remove
-                                            </button>
-                                        )}
-                                    </div>
-
-                                    {/* Custom Image Preview */}
-                                    {previewImage && (
-                                        <div className="mt-2">
-                                            <div className="relative w-48 h-48 rounded-lg overflow-hidden border border-gray-200">
-                                                <img
-                                                    src={previewImage}
-                                                    alt="Preview"
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            </div>
-                                            <p className="mt-1 text-xs text-gray-500">
-                                                Custom notification image
-                                            </p>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
                         </div>
                     </div>
 
