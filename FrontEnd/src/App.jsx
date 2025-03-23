@@ -5,39 +5,48 @@ import { generateToken, messaging } from "./notifications/firebase";
 
 const App = () => {
     const [token, setToken] = useState(null);
-    const [saveStatus, setSaveStatus] = useState('');
+    const [saveStatus, setSaveStatus] = useState("");
 
-    useEffect(() => {
-        const saveTokenToServer = async (token) => {
-            try {
-                const response = await fetch('https://firebase-fcm2-backend.vercel.app/save-token', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ token, device_id: navigator.userAgent }) // Using userAgent as device_id
-                });
+    // 🔹 Generate a persistent device ID (Stored in localStorage)
+    const getDeviceId = () => {
+        let deviceId = localStorage.getItem("device_id");
+        if (!deviceId) {
+            deviceId = crypto.randomUUID(); // Generate new unique ID
+            localStorage.setItem("device_id", deviceId);
+        }
+        return deviceId;
+    };
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+    // 🔹 Save token to the server
+    const saveTokenToServer = async (token) => {
+        try {
+            const response = await fetch("https://firebase-fcm2-backend.vercel.app/save-token", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token, device_id: getDeviceId() }), // Use stored device_id
+            });
 
-                const data = await response.json();
-                if (data.success) {
-                    setSaveStatus('Token saved successfully!');
-                    console.log('Token saved to database');
-                } else {
-                    throw new Error('Failed to save token');
-                }
-            } catch (error) {
-                console.error('Error saving token:', error);
-                setSaveStatus('Failed to save token: ' + error.message);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+            const data = await response.json();
+            if (data.success) {
+                setSaveStatus("Token saved successfully! ✅");
+                console.log("Token saved to database");
+            } else {
+                throw new Error("Failed to save token ❌");
             }
-        };
+        } catch (error) {
+            console.error("Error saving token:", error);
+            setSaveStatus("Failed to save token: " + error.message);
+        }
+    };
 
+    // 🔹 Initialize token on mount
+    useEffect(() => {
         const initializeToken = async () => {
             try {
-                const storedToken = localStorage.getItem('token');
+                let storedToken = localStorage.getItem("token");
+
                 if (storedToken) {
                     setToken(storedToken);
                     await saveTokenToServer(storedToken);
@@ -45,35 +54,54 @@ const App = () => {
                     const newToken = await generateToken();
                     if (newToken) {
                         setToken(newToken);
-                        localStorage.setItem('token', newToken);
+                        localStorage.setItem("token", newToken);
                         await saveTokenToServer(newToken);
                     }
                 }
             } catch (error) {
-                console.error('Error initializing token:', error);
-                setSaveStatus('Error initializing token: ' + error.message);
+                console.error("Error initializing token:", error);
+                setSaveStatus("Error initializing token: " + error.message);
             }
         };
 
         initializeToken();
 
+        // 🔹 Listen for incoming messages
         onMessage(messaging, (payload) => {
-            console.log('Message received. ', payload);
+            console.log("FCM Message received: ", payload);
         });
     }, []);
 
+    // 🔹 Generate & save new token on button click
+    const handleGenerateToken = async () => {
+        try {
+            const newToken = await generateToken();
+            if (newToken) {
+                setToken(newToken);
+                localStorage.setItem("token", newToken);
+                await saveTokenToServer(newToken);
+            }
+        } catch (error) {
+            console.error("Error generating token:", error);
+            alert("Failed to generate token ❌");
+        }
+    };
+
+    // 🔹 Copy token to clipboard
     const handleCopyToken = () => {
-        navigator.clipboard.writeText(token);
-        alert('Token copied to clipboard!');
+        if (token) {
+            navigator.clipboard.writeText(token);
+            alert("Token copied to clipboard! ✅");
+        }
     };
 
     return (
         <div>
-            <h1>Push Notification</h1>
-            <button onClick={handleCopyToken}>Copy Token</button>
-            <p>Token: {token}</p>
+            <h1>Push Notification 🔔</h1>
+            <button onClick={handleCopyToken}>Copy Token 📋</button>
+            <p>Token: {token || "Generating..."}</p>
             {saveStatus && <p>{saveStatus}</p>}
-            <button onClick={generateToken}>Generate Token</button>
+            <button onClick={handleGenerateToken}>Generate New Token 🔄</button>
             <CustomNoti />
         </div>
     );
