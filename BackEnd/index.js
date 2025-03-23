@@ -7,9 +7,11 @@ const notificationRoutes = require('./routes/notification.routes');
 
 const app = express();
 
-// Enable CORS
+// Enable CORS - Remove the trailing slash from origin
 app.use(cors({
-    origin: 'https://firebase-fcm2.vercel.app/',
+    origin: ['https://firebase-fcm2.vercel.app', 'http://localhost:5173'],  // Remove trailing slash
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 }));
 app.use(express.json());
