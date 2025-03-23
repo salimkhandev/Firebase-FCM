@@ -7,8 +7,7 @@ function CustomNoti() {
     const [status, setStatus] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
-    const API_URL = 'http://localhost:3000';
+    const API_URL = 'https://firebase-fcm2-backend.vercel.app';
 
     // Fetch tokens from API
     useEffect(() => {
