@@ -1,13 +1,12 @@
-require('dotenv').config(); // Load environment variables
-const { Pool } = require("pg");
+const { Pool } = require('pg');
+require('dotenv').config();
 
-// Create a PostgreSQL connection pool
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false } // Required for Supabase
+    ssl: { rejectUnauthorized: false }
 });
 
-// Check database connection
+// Test the connection
 pool.connect()
     .then(() => console.log("✅ Connected to Supabase PostgreSQL"))
     .catch(err => console.error("❌ Connection Error:", err.stack));
