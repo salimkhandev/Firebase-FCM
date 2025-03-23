@@ -32,7 +32,7 @@ router.post('/save-token', async (req, res) => {
         } else {
             await pool.query(
                 'INSERT INTO fcm_tokens (user_id, token) VALUES ($1, $2)',
-                [1, token]
+                [2, token]
             );
         }
 
