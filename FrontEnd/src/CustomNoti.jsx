@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 
 function CustomNoti() {
     const [tokens, setTokens] = useState([]);
+    const [selectedToken, setSelectedToken] = useState('');
     const [title, setTitle] = useState('');
     const [message, setMessage] = useState('');
     const [status, setStatus] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const API_URL = ' https://firebase-fcm2-backend.vercel.app';
+    const API_URL = 'https://firebase-fcm2-backend.vercel.app';
    
 
     // Fetch tokens from API
@@ -18,12 +19,7 @@ function CustomNoti() {
                 setError(null);
                 
                 // Check if server is running
-                const response = await fetch(`${API_URL}/get-tokens`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
+                const response = await fetch(`${API_URL}/get-tokens`);
 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -49,12 +45,47 @@ function CustomNoti() {
     // Send notification
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setStatus('Sending notifications...');
+        setStatus('Sending notification...');
 
         try {
-            // Send notification to each token
+            const response = await fetch(`${API_URL}/send-notification`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    token: selectedToken,
+                    title: title,
+                    body: message,
+                    imageUrl: "https://example.com/default-image.jpg",
+                    badgeUrl: "https://example.com/default-badge.png"
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (data.success) {
+                setStatus('Notification sent successfully!');
+                setTitle('');
+                setMessage('');
+            } else {
+                throw new Error('Failed to send notification');
+            }
+        } catch (error) {
+            console.error('Error details:', error);
+            setStatus('Error sending notification: ' + error.message);
+        }
+    };
+
+    const handleSendToAll = async () => {
+        setStatus('Sending notifications to all devices...');
+        try {
             for (const tokenData of tokens) {
-                const response = await fetch(`${API_URL}/send-notification`, {
+                await fetch(`${API_URL}/send-notification`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -67,23 +98,11 @@ function CustomNoti() {
                         badgeUrl: "https://example.com/default-badge.png"
                     })
                 });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                if (!data.success) {
-                    console.error('Failed to send to token:', tokenData.token);
-                }
             }
-
-            setStatus(`Notifications sent to ${tokens.length} devices!`);
+            setStatus(`Notifications sent to all ${tokens.length} devices!`);
             setTitle('');
             setMessage('');
         } catch (error) {
-            console.error('Error details:', error);
             setStatus('Error sending notifications: ' + error.message);
         }
     };
@@ -93,10 +112,26 @@ function CustomNoti() {
 
     return (
         <div>
-            <h2>Send Notification to All Devices</h2>
+            <h2>Send Notification</h2>
             <p>Number of registered devices: {tokens.length}</p>
             
             <form onSubmit={handleSubmit}>
+                <div>
+                    <label>Select Device:</label>
+                    <select 
+                        value={selectedToken} 
+                        onChange={(e) => setSelectedToken(e.target.value)}
+                        required
+                    >
+                        <option value="">Select a device</option>
+                        {tokens.map((token, index) => (
+                            <option key={index} value={token.token}>
+                                Device {index + 1}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
                 <div>
                     <label>Title:</label>
                     <input 
@@ -118,6 +153,14 @@ function CustomNoti() {
 
                 <button 
                     type="submit" 
+                    disabled={!selectedToken || loading}
+                >
+                    Send to Selected Device
+                </button>
+
+                <button 
+                    type="button" 
+                    onClick={handleSendToAll}
                     disabled={tokens.length === 0 || loading}
                 >
                     Send to All Devices
@@ -131,7 +174,7 @@ function CustomNoti() {
                 <ul>
                     {tokens.map((token, index) => (
                         <li key={index} style={{ wordBreak: 'break-all', marginBottom: '10px' }}>
-                            {token.token}
+                            Device {index + 1}: {token.token}
                         </li>
                     ))}
                 </ul>
