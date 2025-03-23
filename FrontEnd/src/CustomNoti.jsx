@@ -91,7 +91,7 @@ function CustomNoti() {
                     title: title,
                     body: message,
                     imageUrl: useDefaultImage ? DEFAULT_IMAGE : (imageUrl || null),
-                    badgeUrl: "https://example.com/default-badge.png"
+                    badgeUrl: "https://cdn-icons-png.flaticon.com/512/4658/4658667.png"
                 })
             });
             
