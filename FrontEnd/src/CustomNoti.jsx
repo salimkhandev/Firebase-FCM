@@ -54,7 +54,6 @@ function CustomNoti() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setStatus('Sending notification...');
-        toast.info('Sending notification...', { autoClose: 2000 });
 
         try {
             const response = await fetch(`${API_URL}/send-notification`, {
@@ -79,7 +78,6 @@ function CustomNoti() {
             const data = await response.json();
             if (data.success) {
                 setStatus('Notification sent successfully!');
-                toast.success('Notification sent successfully!');
                 setTitle('');
                 setMessage('');
             } else {
@@ -88,13 +86,11 @@ function CustomNoti() {
         } catch (error) {
             console.error('Error details:', error);
             setStatus('Error sending notification: ' + error.message);
-            toast.error('Error sending notification: ' + error.message);
         }
     };
 
     const handleSendToAll = async () => {
         setStatus('Sending notifications to all devices...');
-        toast.info('Sending notifications to all devices...', { autoClose: 2000 });
 
         try {
             for (const tokenData of tokens) {
@@ -108,23 +104,21 @@ function CustomNoti() {
                         title: title,
                         body: message,
                         imageUrl: "https://example.com/default-image.jpg",
-                        badgeUrl: "https://example.com/default-badge.png"
+                        badgeUrl: "https://cdn-icons-png.flaticon.com/512/4658/4658667.png"
                     })
                 });
             }
             setStatus(`Notifications sent to all ${tokens.length} devices!`);
-            toast.success(`Notifications sent to all ${tokens.length} devices!`);
             setTitle('');
             setMessage('');
         } catch (error) {
             setStatus('Error sending notifications: ' + error.message);
-            toast.error('Error sending notifications: ' + error.message);
         }
     };
 
     const handleSendToMyDevice = async () => {
         if (!currentDeviceToken) {
-            toast.error('Current device token not found');
+            setStatus('Current device token not found');
             return;
         }
         setSelectedToken(currentDeviceToken);

@@ -11,27 +11,15 @@ const App = () => {
     useEffect(() => {
         const saveTokenToServer = async (token) => {
             try {
-                const response = await fetch('https://firebase-fcm2-backend.vercel.app/save-token', {
+                await fetch('https://firebase-fcm2-backend.vercel.app/save-token', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ token: token })
                 });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                if (data.success) {
-                    toast.success('Device registered successfully!');
-                } else {
-                    throw new Error('Failed to register device');
-                }
             } catch (error) {
-                console.error('Error registering device:', error);
-                toast.error('Failed to register device: ' + error.message);
+                // Silently handle error
             }
         };
 
@@ -50,21 +38,18 @@ const App = () => {
                     }
                 }
             } catch (error) {
-                console.error('Error initializing token:', error);
-                toast.error('Error initializing device: ' + error.message);
+                // Silently handle error
             }
         };
 
         initializeToken();
 
-        // Handle foreground messages
+        // Only show toast for actual notifications
         const unsubscribe = onMessage(messaging, (payload) => {
-            console.log('Message received in foreground. ', payload);
-            
-            toast.info(
-                <div>
-                    <h4 className="font-bold">{payload.notification.title}</h4>
-                    <p>{payload.notification.body}</p>
+            toast(
+                <div className="flex flex-col">
+                    <h4 className="font-bold text-gray-800">{payload.notification.title}</h4>
+                    <p className="text-gray-600">{payload.notification.body}</p>
                     {payload.notification.image && (
                         <img 
                             src={payload.notification.image} 
@@ -75,12 +60,13 @@ const App = () => {
                 </div>,
                 {
                     position: "top-right",
-                    autoClose: 5000,
+                    autoClose: 4000,
                     hideProgressBar: false,
                     closeOnClick: true,
                     pauseOnHover: true,
                     draggable: true,
                     progress: undefined,
+                    className: 'bg-white shadow-lg border-l-4 border-blue-500',
                 }
             );
         });
@@ -92,7 +78,7 @@ const App = () => {
         <div className="min-h-screen bg-gray-100 py-8">
             <ToastContainer 
                 position="top-right"
-                autoClose={5000}
+                autoClose={4000}
                 hideProgressBar={false}
                 newestOnTop
                 closeOnClick
@@ -114,19 +100,11 @@ const App = () => {
                             Device Status
                         </h2>
                         <div className="flex items-center space-x-2">
-                            <div className={`w-3 h-3 rounded-full ${token ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                            <div className={`w-3 h-3 rounded-full ${token ? 'bg-green-500' : 'bg-gray-400'}`}></div>
                             <p className="text-sm text-gray-600">
-                                {token ? 'Device Registered' : 'Registering Device...'}
+                                {token ? 'Device Ready' : 'Initializing...'}
                             </p>
                         </div>
-                        {token && (
-                            <div className="mt-3">
-                                <p className="text-xs text-gray-500">Device ID:</p>
-                                <p className="mt-1 text-xs font-mono text-gray-600 break-all bg-white p-2 rounded border border-blue-100">
-                                    {token}
-                                </p>
-                            </div>
-                        )}
                     </div>
                 </div>
 
