@@ -103,7 +103,7 @@ function CustomNoti() {
                         token: tokenData.token,
                         title: title,
                         body: message,
-                        imageUrl: "https://example.com/default-image.jpg",
+                        imageUrl: "https://www.shutterstock.com/image-vector/fired-rubber-stamp-seal-vector-260nw-2406578221.jpg",
                         badgeUrl: "https://cdn-icons-png.flaticon.com/512/4658/4658667.png"
                     })
                 });
