@@ -27,7 +27,7 @@ router.post('/save-token', async (req, res) => {
         if (existingToken.rows.length > 0) {
             await pool.query(
                 'UPDATE fcm_tokens SET user_id = $1 WHERE token = $2',
-                [1, token]
+                [2, token]
             );
         } else {
             await pool.query(
