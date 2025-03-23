@@ -8,7 +8,7 @@ function CustomNoti() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const API_URL = 'https://firebase-fcm2-backend.vercel.app';
+    const API_URL = 'http://localhost:3000';
 
     // Fetch tokens from API
     useEffect(() => {
@@ -54,27 +54,28 @@ function CustomNoti() {
         try {
             // Send notification to each token
             for (const tokenData of tokens) {
-                const response = await fetch('http://localhost:3000/send-notification', {
+                const response = await fetch(`${API_URL}/send-notification`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        token: tokenData.fcm_token,
+                        token: tokenData.token,
                         title: title,
                         body: message,
                         imageUrl: "https://example.com/default-image.jpg",
                         badgeUrl: "https://example.com/default-badge.png"
-                    }),
+                    })
                 });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
                 }
 
                 const data = await response.json();
                 if (!data.success) {
-                    console.error('Failed to send to token:', tokenData.fcm_token);
+                    console.error('Failed to send to token:', tokenData.token);
                 }
             }
 
@@ -82,6 +83,7 @@ function CustomNoti() {
             setTitle('');
             setMessage('');
         } catch (error) {
+            console.error('Error details:', error);
             setStatus('Error sending notifications: ' + error.message);
         }
     };
@@ -129,7 +131,7 @@ function CustomNoti() {
                 <ul>
                     {tokens.map((token, index) => (
                         <li key={index} style={{ wordBreak: 'break-all', marginBottom: '10px' }}>
-                            {token.fcm_token}
+                            {token.token}
                         </li>
                     ))}
                 </ul>
