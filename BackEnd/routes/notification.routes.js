@@ -15,23 +15,25 @@ router.get('/get-tokens', async (req, res) => {
     }
 });
 
-// Save token
 router.post('/save-token', async (req, res) => {
-    const { token } = req.body;
+    const { token, device_id } = req.body;  // Send `device_id` from frontend
 
     try {
-        // Insert the token, allowing multiple tokens but preventing exact duplicates
+        // Check if the device already exists
         await pool.query(
-            'INSERT INTO fcm_tokens (token) VALUES ($1) ON CONFLICT (token) DO NOTHING',
-            [token]
+            `INSERT INTO fcm_tokens (device_id, token)
+             VALUES ($1, $2)
+             ON CONFLICT (device_id) DO UPDATE SET token = EXCLUDED.token`,
+            [device_id, token]
         );
 
-        res.status(201).json({ success: true, message: 'Token inserted or already exists' });
+        res.status(201).json({ success: true, message: 'Token updated successfully' });
     } catch (error) {
         console.error('Error saving token:', error);
         res.status(500).json({ success: false, error: error.message });
     }
 });
+
 
 
 // Send notification

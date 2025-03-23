@@ -15,7 +15,7 @@ const App = () => {
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ token: token })
+                    body: JSON.stringify({ token, device_id: navigator.userAgent }) // Using userAgent as device_id
                 });
 
                 if (!response.ok) {
