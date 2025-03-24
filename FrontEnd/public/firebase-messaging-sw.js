@@ -13,11 +13,9 @@ const FILES_TO_CACHE = [
     '/manifest.json',
     '/icons/icon-192x192.png',
     '/icons/icon-512x512.png',
-    // Add your CSS and JS files that Vite generates
-    // You can find these in the dist folder after building
 ];
 
-// Initialize Firebase first
+// Initialize Firebase
 firebase.initializeApp({
     apiKey: "AIzaSyBitV6MCQj4INcj_yfW4ljILifa-7ziRik",
     authDomain: "pwa-push-notification-8649b.firebaseapp.com",
@@ -30,21 +28,22 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
+// Handle background messages
 messaging.onBackgroundMessage((payload) => {
     console.log('[firebase-messaging-sw.js] Received background message ', payload);
     const notificationTitle = payload.notification.title;
-    // const notificationOptions = {
-    //     body: payload.notification.body,
-    //     icon: payload.notification.icon || '/icons/icon-192x192.png',
-    //     badge: payload.notification.badge || '/icons/icon-192x192.png',
-    //     image: payload.notification.image,
-    //     data: payload.data
-    // };
+    const notificationOptions = {
+        body: payload.notification.body,
+        icon: payload.notification.icon || '/icons/icon-192x192.png',
+        badge: payload.notification.badge || '/icons/icon-192x192.png',
+        image: payload.notification.image,
+        data: payload.data
+    };
 
     self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
-// Install event handler with precaching
+// Install event handler
 self.addEventListener('install', (event) => {
     console.log('🔧 Installing Service Worker...');
     event.waitUntil(
@@ -56,9 +55,6 @@ self.addEventListener('install', (event) => {
             .then(() => {
                 console.log('✅ Installation completed');
                 return self.skipWaiting();
-            })
-            .catch((error) => {
-                console.error('❌ Installation failed:', error);
             })
     );
 });
@@ -85,13 +81,11 @@ self.addEventListener('activate', (event) => {
     );
 });
 
-// Fetch event handler with network-first strategy
+// Fetch event handler with cache-first strategy
 self.addEventListener('fetch', (event) => {
-    // Only handle GET requests
-    if (event.request.method !== 'GET') return;
-
-    // Don't cache Firebase API calls or chrome-extension requests
+    // Skip non-GET requests and Firebase-related requests
     if (
+        event.request.method !== 'GET' ||
         event.request.url.includes('firebase') ||
         event.request.url.startsWith('chrome-extension://')
     ) {
@@ -99,45 +93,52 @@ self.addEventListener('fetch', (event) => {
     }
 
     event.respondWith(
-        fetch(event.request)
-            .then((networkResponse) => {
-                // Clone the response before caching it
-                const responseToCache = networkResponse.clone();
-
-                if (networkResponse.status === 200) {
-                    caches.open(CACHE_NAME)
-                        .then((cache) => {
-                            console.log('📥 Caching new resource:', event.request.url);
-                            cache.put(event.request, responseToCache);
+        // Try cache first
+        caches.match(event.request)
+            .then((cachedResponse) => {
+                if (cachedResponse) {
+                    console.log('📦 Serving from cache:', event.request.url);
+                    // Fetch and cache update in background
+                    fetch(event.request)
+                        .then((networkResponse) => {
+                            caches.open(CACHE_NAME)
+                                .then((cache) => {
+                                    cache.put(event.request, networkResponse);
+                                    console.log('🔄 Updated cache:', event.request.url);
+                                });
+                        })
+                        .catch(() => {
+                            console.log('❌ Network update failed:', event.request.url);
                         });
+                    return cachedResponse;
                 }
 
-                return networkResponse;
-            })
-            .catch(() => {
-                console.log('🔍 Serving from cache:', event.request.url);
-                return caches.match(event.request)
-                    .then((cachedResponse) => {
-                        if (cachedResponse) {
-                            return cachedResponse;
+                // If not in cache, try network
+                return fetch(event.request)
+                    .then((networkResponse) => {
+                        // Clone the response before using it
+                        const responseToCache = networkResponse.clone();
+
+                        if (networkResponse.status === 200) {
+                            caches.open(CACHE_NAME)
+                                .then((cache) => {
+                                    cache.put(event.request, responseToCache);
+                                    console.log('📥 Added to cache:', event.request.url);
+                                });
                         }
-                        // If no cache found, return a default offline page or asset
-                        return caches.match('/offline.html');
+
+                        return networkResponse;
+                    })
+                    .catch((error) => {
+                        console.log('❌ Network & cache failed:', event.request.url, error);
+                        // If both cache and network fail, return offline page
+                        if (event.request.mode === 'navigate') {
+                            return caches.match('/offline.html');
+                        }
+                        return new Response('Offline content not available');
                     });
             })
     );
-});
-
-// Optional: Handle offline fallback
-self.addEventListener('fetch', (event) => {
-    if (event.request.mode === 'navigate') {
-        event.respondWith(
-            fetch(event.request)
-                .catch(() => {
-                    return caches.match('/offline.html');
-                })
-        );
-    }
 });
 
 // Injection point for the precache manifest
