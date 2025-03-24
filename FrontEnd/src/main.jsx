@@ -3,10 +3,11 @@ import ReactDOM from 'react-dom/client'
 import { registerSW } from 'virtual:pwa-register'
 import App from './App.jsx'
 import './index.css'
-// import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
 
 
 if ('serviceWorker' in navigator) {
+  
   const updateSW = registerSW({
     immediate: true,
     swUrl: '/firebase-messaging-sw.js',
