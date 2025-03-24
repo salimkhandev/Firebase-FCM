@@ -65,7 +65,8 @@ function CustomNoti() {
                     title: title,
                     body: message,
                     imageUrl: "https://www.shutterstock.com/image-vector/fired-rubber-stamp-seal-vector-260nw-2406578221.jpg",
-                    badgeUrl: "https://cdn-icons-png.flaticon.com/512/4658/4658667.png"
+                    badgeUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZSwQ-a_hsZqk7ZoWU0n5iXBmN4leE1-NDuw&s"
+                    // badgeUrl: "https://cdn-icons-png.flaticon.com/512/4658/4658667.png"
                 })
             });
 
