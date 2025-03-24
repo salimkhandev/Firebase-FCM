@@ -31,16 +31,16 @@ const messaging = firebase.messaging();
 // Handle background messages
 messaging.onBackgroundMessage((payload) => {
     console.log('[firebase-messaging-sw.js] Received background message ', payload);
-    const notificationTitle = payload.notification.title;
-    const notificationOptions = {
-        body: payload.notification.body,
-        icon: payload.notification.icon || '/icons/icon-192x192.png',
-        badge: payload.notification.badge || '/icons/icon-192x192.png',
-        image: payload.notification.image,
-        data: payload.data
-    };
+    // const notificationTitle = payload.notification.title;
+    // const notificationOptions = {
+    //     body: payload.notification.body,
+    //     icon: payload.notification.icon || '/icons/icon-192x192.png',
+    //     badge: payload.notification.badge || '/icons/icon-192x192.png',
+    //     image: payload.notification.image,
+    //     data: payload.data
+    // };
 
-    self.registration.showNotification(notificationTitle, notificationOptions);
+    // self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
 // Install event handler
