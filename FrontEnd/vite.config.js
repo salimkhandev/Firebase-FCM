@@ -9,7 +9,7 @@ export default defineConfig({
     VitePWA({
       strategies: 'injectManifest',
       srcDir: 'public',
-      filename: 'service-worker.js',
+      filename: 'firebase-messaging-sw.js',
       registerType: 'autoUpdate',
       manifest: false,
       useManifestFromFile: true,
