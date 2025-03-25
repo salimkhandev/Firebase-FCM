@@ -65,8 +65,7 @@ function CustomNoti() {
                     title: title,
                     body: message,
                     imageUrl: "https://www.shutterstock.com/image-vector/fired-rubber-stamp-seal-vector-260nw-2406578221.jpg",
-                    badgeUrl: "https://cdn-icons-png.freepik.com/512/3130/3130918.png?uid=R150184428&ga=GA1.1.1954562269.1729245862"                
-                        // badgeUrl: "https://cdn-icons-png.flaticon.com/512/4658/4658667.png"
+                    badgeUrl: "https://cdn-icons-png.flaticon.com/512/4658/4658667.png"                
                 })
             });
 
@@ -104,8 +103,8 @@ function CustomNoti() {
                         title: title,
                         body: message,
                         imageUrl: "https://www.shutterstock.com/image-vector/fired-rubber-stamp-seal-vector-260nw-2406578221.jpg",
-                        // badgeUrl: "https://cdn-icons-png.flaticon.com/512/4658/4658667.png"
-                        badgeUrl: "https://cdn-icons-png.freepik.com/512/3130/3130918.png?uid=R150184428&ga=GA1.1.1954562269.1729245862"
+                        badgeUrl: "https://cdn-icons-png.flaticon.com/512/4658/4658667.png"
+                        // badgeUrl: "https://cdn-icons-png.freepik.com/512/3130/3130918.png?uid=R150184428&ga=GA1.1.1954562269.1729245862"
                     })
                 });
             }
