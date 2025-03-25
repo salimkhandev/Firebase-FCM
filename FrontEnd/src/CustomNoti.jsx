@@ -104,7 +104,8 @@ function CustomNoti() {
                         title: title,
                         body: message,
                         imageUrl: "https://www.shutterstock.com/image-vector/fired-rubber-stamp-seal-vector-260nw-2406578221.jpg",
-                        badgeUrl: "https://cdn-icons-png.flaticon.com/512/4658/4658667.png"
+                        // badgeUrl: "https://cdn-icons-png.flaticon.com/512/4658/4658667.png"
+                        badgeUrl: "https://cdn-icons-png.freepik.com/256/8297/8297353.png?semt=ais_hybrid"
                     })
                 });
             }
@@ -116,14 +117,6 @@ function CustomNoti() {
         }
     };
 
-    const handleSendToMyDevice = async () => {
-        if (!currentDeviceToken) {
-            setStatus('Current device token not found');
-            return;
-        }
-        setSelectedToken(currentDeviceToken);
-        await handleSubmit(new Event('submit'));
-    };
 
     if (loading) return (
         <div className="flex items-center justify-center min-h-screen">
@@ -141,26 +134,7 @@ function CustomNoti() {
         <div className="max-w-4xl mx-auto p-6 space-y-8">
             <div className="bg-white rounded-lg shadow-lg p-6">
                 <h2 className="text-2xl font-bold text-gray-800 mb-4">Send Notification</h2>
-                
-                {/* Quick Actions */}
-                <div className="mb-6 space-y-4">
-                    {currentDeviceToken && (
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <h3 className="text-sm font-semibold text-blue-800">Your Device</h3>
-                                    <p className="text-xs text-gray-600 mt-1">Send a notification directly to this device</p>
-                                </div>
-                                <button 
-                                    onClick={handleSendToMyDevice}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm"
-                                >
-                                    Send to My Device
-                                </button>
-                            </div>
-                        </div>
-                    )}
-                </div>
+             
 
                 <div className="bg-blue-50 rounded-lg p-4 mb-6">
                     <p className="text-blue-800">
