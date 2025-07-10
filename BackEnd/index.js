@@ -32,6 +32,10 @@ try {
 
 // Routes
 app.use('/', notificationRoutes);
+app.get('/', (req, res) => {
+  res.json({ message: 'Hello there' });
+});
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
